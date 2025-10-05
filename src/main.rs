@@ -32,7 +32,8 @@ impl Machine {
 
 struct SuperMachine {
     machines: Vec<Machine>,
-    tokens: Vec<String>,
+    keywords: Vec<String>,
+    identifiers: Vec<String>,
 }
 
 impl SuperMachine {
@@ -45,13 +46,14 @@ impl SuperMachine {
 
         SuperMachine {
             machines,
-            tokens: Vec::new(),
+            keywords: Vec::new(),
+            identifiers: Vec::new(),
         }
     }
 
     fn run(&mut self, input: &str) {
         let input_str = input.to_string();
-        self.tokens.clear();
+        self.keywords.clear();
 
         let mut blank_machine = Machine::new(" ");
         let mut start_slice = 0;
@@ -59,21 +61,33 @@ impl SuperMachine {
         let mut iter = input_str.char_indices().peekable();
 
         while let Some((index, character)) = iter.next() {
-            if let Some((_, next_char)) = iter.peek() {
-                if blank_machine.transition(*next_char) {
+            match iter.peek() {
+                Some((_, next_char)) => {
+                    if blank_machine.transition(*next_char) {
+                        let word = &input_str[start_slice..index + character.len_utf8()];
+                        let machines_result = self.check_word(word);
+                        if machines_result {
+                            self.keywords.push(word.to_string());
+                        } else {
+                            self.identifiers.push(word.to_string());
+                        }
+                        start_slice = index + 1 + character.len_utf8();
+                    }
+                }
+                None => {
+                    // Handle last character (no next_char)
                     let word = &input_str[start_slice..index + character.len_utf8()];
-                    println!("{word}");
                     let machines_result = self.check_word(word);
                     if machines_result {
-                        self.tokens.push(word.to_string());
+                        self.keywords.push(word.to_string());
                     } else {
-                        panic!("Syntax error in input")
+                        self.identifiers.push(word.to_string());
                     }
-                    start_slice = index + character.len_utf8();
                 }
             }
         }
-        println!("{:?}", self.tokens);
+        println!("Keywords: {:?}", self.keywords);
+        println!("Identifieres: {:?}", self.identifiers);
     }
 
     fn check_word(&mut self, word: &str) -> bool {
@@ -91,6 +105,6 @@ impl SuperMachine {
 }
 
 fn main() {
-    let mut machine = SuperMachine::new(vec!["public", "static", "void", "main"]);
-    machine.run("public stv atic tr");
+    let mut machine = SuperMachine::new(vec!["public", "static", "void", "class"]);
+    machine.run("public static void main");
 }
