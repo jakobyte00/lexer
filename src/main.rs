@@ -5,10 +5,7 @@ struct Machine {
 
 impl Machine {
     fn new(keyword: &str) -> Self {
-        let mut nodes = Vec::new();
-        for character in keyword.chars() {
-            nodes.push(character);
-        }
+        let nodes = keyword.chars().collect();
         Machine {
             state: 0,
             nodes: nodes,
@@ -55,7 +52,10 @@ impl SuperMachine {
         let mut blank_machine = Machine::new(" ");
 
         let mut start_slice = 0;
+
         let mut iter = input_str.chars().enumerate();
+
+        // True means a valid token was detected up to the previous char
         let mut previous_true = false;
         while let Some((index, character)) = iter.next() {
             blank_machine.transition(character);
