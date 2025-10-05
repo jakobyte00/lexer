@@ -79,7 +79,7 @@ impl SuperMachine {
             }
         }
         println!("Keywords: {:?}", self.keywords);
-        println!("Identifieres: {:?}", self.identifiers);
+        println!("Identifiers: {:?}", self.identifiers);
     }
 }
 
