@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 struct Machine {
     state: usize,
     nodes: Vec<char>,
